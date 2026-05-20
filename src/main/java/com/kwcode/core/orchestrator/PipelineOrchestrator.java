@@ -161,6 +161,15 @@ public class PipelineOrchestrator {
             emit(onStatus, "env_probe", "  就绪: " + envResult.getOrDefault("ready", false));
             emit(onStatus, "env_probe", "  已安装: " + envResult.getOrDefault("installed", "[]"));
             emit(onStatus, "env_probe", "  测试命令: " + envResult.getOrDefault("test_cmd", "none"));
+            if (envResult.containsKey("jdk_version")) {
+                emit(onStatus, "env_probe", "  JDK版本: " + envResult.get("jdk_version"));
+            }
+            if (envResult.containsKey("jdk_home")) {
+                emit(onStatus, "env_probe", "  JDK目录: " + envResult.get("jdk_home"));
+            }
+            if (envResult.containsKey("maven_version")) {
+                emit(onStatus, "env_probe", "  Maven版本: " + envResult.get("maven_version"));
+            }
             if (envResult.containsKey("test_cmd")) {
                 ctx.confirmedTestCmd = (String) envResult.get("test_cmd");
             }

@@ -138,9 +138,83 @@ public class EnvProber {
             result.ready = result.testCmd != null && !result.testCmd.isEmpty();
         }
 
+        // JDK/Maven环境信息探测
+        probeJdkInfo(result, projectRoot);
+
         // 缓存
         saveCache(projectRoot, result);
         return result;
+    }
+
+    /**
+     * 探测JDK版本、安装目录和Maven版本
+     * <p>
+     * 在probeAndFix中调用，结果写入EnvProbeResult。
+     * </p>
+     */
+    private void probeJdkInfo(EnvProbeResult result, String projectRoot) {
+        // JDK版本
+        try {
+            var pb = new ProcessBuilder("cmd", "/c", "java -version");
+            pb.directory(Path.of(projectRoot).toFile());
+            pb.redirectErrorStream(true);
+            var proc = pb.start();
+            String output = new String(proc.getInputStream().readAllBytes());
+            proc.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
+            // java -version 输出到 stderr，已合并到 stdout
+            var m = java.util.regex.Pattern.compile("\"([^\"]+)\"").matcher(output);
+            if (m.find()) {
+                result.setJdkVersion(m.group(1));
+                log.info("[env] JDK version: {}", m.group(1));
+            }
+        } catch (Exception e) {
+            log.debug("[env] JDK version probe failed: {}", e.getMessage());
+        }
+
+        // JAVA_HOME
+        String javaHome = System.getenv("JAVA_HOME");
+        if (javaHome != null && !javaHome.isEmpty()) {
+            result.setJdkHome(javaHome);
+            log.info("[env] JAVA_HOME: {}", javaHome);
+        } else {
+            // 尝试从 java 命令路径推断
+            try {
+                var pb = new ProcessBuilder("cmd", "/c", "where java");
+                pb.redirectErrorStream(true);
+                var proc = pb.start();
+                String output = new String(proc.getInputStream().readAllBytes());
+                proc.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
+                // 典型输出: C:\Program Files\Java\jdk-17\bin\java.exe
+                var lines = output.split("\r?\n");
+                if (lines.length > 0) {
+                    String javaPath = lines[0].trim();
+                    int binIdx = javaPath.toLowerCase().indexOf("\\bin\\");
+                    if (binIdx > 0) {
+                        result.setJdkHome(javaPath.substring(0, binIdx));
+                        log.info("[env] JDK home (inferred): {}", javaPath.substring(0, binIdx));
+                    }
+                }
+            } catch (Exception e) {
+                log.debug("[env] JDK home inference failed: {}", e.getMessage());
+            }
+        }
+
+        // Maven版本
+        try {
+            var pb = new ProcessBuilder("cmd", "/c", "mvn -version");
+            pb.directory(Path.of(projectRoot).toFile());
+            pb.redirectErrorStream(true);
+            var proc = pb.start();
+            String output = new String(proc.getInputStream().readAllBytes());
+            proc.waitFor(15, java.util.concurrent.TimeUnit.SECONDS);
+            var m = java.util.regex.Pattern.compile("Apache Maven (\\S+)").matcher(output);
+            if (m.find()) {
+                result.setMavenVersion(m.group(1));
+                log.info("[env] Maven version: {}", m.group(1));
+            }
+        } catch (Exception e) {
+            log.debug("[env] Maven version probe failed: {}", e.getMessage());
+        }
     }
 
     /**
@@ -333,6 +407,9 @@ public class EnvProber {
         private final List<String> installed;
         private String testCmd;
         private final boolean rigBuilt;
+        private String jdkVersion;
+        private String jdkHome;
+        private String mavenVersion;
 
         public EnvProbeResult(String lang, boolean ready, List<String> installed, String testCmd, boolean rigBuilt) {
             this.lang = lang;
@@ -347,9 +424,15 @@ public class EnvProber {
         public List<String> installed() { return installed; }
         public String testCmd() { return testCmd; }
         public boolean rigBuilt() { return rigBuilt; }
+        public String jdkVersion() { return jdkVersion; }
+        public String jdkHome() { return jdkHome; }
+        public String mavenVersion() { return mavenVersion; }
 
         public void setReady(boolean v) { this.ready = v; }
         public void setTestCmd(String v) { this.testCmd = v; }
+        public void setJdkVersion(String v) { this.jdkVersion = v; }
+        public void setJdkHome(String v) { this.jdkHome = v; }
+        public void setMavenVersion(String v) { this.mavenVersion = v; }
 
         public Map<String, Object> toMap() {
             Map<String, Object> m = new java.util.LinkedHashMap<>();
@@ -358,6 +441,9 @@ public class EnvProber {
             m.put("installed", installed);
             m.put("test_cmd", testCmd);
             m.put("rig_built", rigBuilt);
+            if (jdkVersion != null) m.put("jdk_version", jdkVersion);
+            if (jdkHome != null) m.put("jdk_home", jdkHome);
+            if (mavenVersion != null) m.put("maven_version", mavenVersion);
             return m;
         }
     }
