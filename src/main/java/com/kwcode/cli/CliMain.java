@@ -155,6 +155,10 @@ public class CliMain implements Callable<Integer> {
 
             try {
                 Map<String, Object> gateResult = bundle.getGate().classify(input, "", null);
+                //输出路由到专家类型
+                if(gateResult!=null){
+                    System.out.printf("🔀 路由到专家: %s%n", gateResult.toString());
+                }
                 var oResult = bundle.getOrchestrator().run(
                         input, gateResult, projectDir,
                         (s, d) -> System.out.println("  [" + s + "] " + d),

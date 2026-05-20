@@ -103,6 +103,10 @@ public class PipelineOrchestrator {
         String expertType = (String) gateResult.getOrDefault("expert_type", "locator_repair");
         String difficulty = (String) gateResult.getOrDefault("difficulty", "medium");
         String systemPrompt = (String) gateResult.getOrDefault("system_prompt", "");
+        log.info("[orchestrator] Gate结果 → expertType={}", expertType);
+        log.info("[orchestrator] Gate结果 → difficulty={}", difficulty);
+        log.info("[orchestrator] Gate结果 → systemPrompt={}", systemPrompt);
+        
         String modelNameRaw = (String) gateResult.getOrDefault("model", "");
         String modelName = !modelNameRaw.isEmpty() ? modelNameRaw : defaultModelName;
         if (modelNameRaw.isEmpty() && !defaultModelName.isEmpty()) {
