@@ -1,6 +1,37 @@
 # JAVA-KW-CODE (天工开物)
 
+> **致谢**：本项目灵感源自 [val1813/kwcode](https://github.com/val1813/kwcode)（Python 版天工开物），感谢原作者用 Python 实现了确定性专家流水线架构，让 Java 程序员有机会用 Java 重新实现 Agent 逻辑，在 JVM 生态中探索 Coding Agent 的可能性。
+
 Java 版本地 Coding Agent — 基于 LLM 的智能代码生成、修复与重构工具。
+
+## 与上游项目的关系
+
+| 维度 | [kwcode (Python)](https://github.com/val1813/kwcode) | javaKwcode (本项目) |
+|------|------|------|
+| 语言 | Python 3.10+ | Java 17+ |
+| 框架 | 纯 Python + pip | Spring Boot 3.4 + Spring AI |
+| AST 引擎 | tree-sitter | JavaParser + ANTLR 4 |
+| 调试器 | sys.settrace (Python) | Java Agent / JDI |
+| 搜索 | rank-bm25 + sentence-transformers | Apache Lucene (BM25) + DuckDuckGo |
+| LLM 集成 | OpenAI Python SDK | Spring AI (OpenAI/Ollama) |
+| 安装方式 | `pip install kwcode` | `mvn clean package` |
+| 协议 | MIT | MIT |
+
+**共享的核心设计**（源自上游项目思路）：
+
+- 确定性专家流水线：EnvProber → Gate → Expert Pipeline → Verifier → Retry
+- BM25 + 调用图两阶段定位
+- Gap 驱动重试 + 熔断机制
+- Deny-First 专家权限模型
+- 飞轮系统（轨迹收集 → 模式检测 → 专家生成）
+- 项目记忆（PROJECT.md / PATTERN.md / EXPERT.md）
+
+**Java 版独有特性**：
+
+- Spring AI 统一 LLM 调用层，无缝切换 OpenRouter / Ollama / 任意 OpenAI 兼容 API
+- JavaParser 深度 AST 分析，原生支持 Java 语法树操作
+- Maven/Gradle 项目自动检测与测试命令适配
+- JVM 生态集成（Spring Boot 应用、Maven 插件化扩展）
 
 ## 简介
 
