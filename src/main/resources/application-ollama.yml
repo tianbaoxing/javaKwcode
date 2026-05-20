@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: kwcode
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: qwen3-8b
+          temperature: 0.1
+
+kwcode:
+  llm:
+    default-provider: ollama
+    model-router:
+      locator:
+        ollama: qwen3-8b
+      generator:
+        ollama: qwen3-8b
+      verifier:
+        ollama: qwen3-8b
+    retry:
+      max-attempts: 3
+      backoff: exponential
+
+logging:
+  level:
+    com.kwcode: DEBUG
