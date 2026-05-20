@@ -118,7 +118,7 @@ public class CliMain implements Callable<Integer> {
      */
     private int runRepl() {
         
-        System.out.println("🎯 KW-CODE 交互模式 (输入 /help 查看命令, /quit 退出)");
+        System.out.println("🎯JAVA-KW-CODE 交互模式 (输入 /help 查看命令, /quit 退出)");
         System.out.printf("   模型: %s | 项目: %s%n", model, projectDir);
 
         PipelineFactory.PipelineConfig config = new PipelineFactory.PipelineConfig();
@@ -171,10 +171,10 @@ public class CliMain implements Callable<Integer> {
     // ── 子命令 ──
 
     /**
-     * 初始化KAIWU.md
+     * 初始化JAVA-KAIWU.md
      * @origin kaiwu/cli/commands/config.py::cmd_init
      */
-    @Command(name = "init", description = "初始化项目KAIWU.md")
+    @Command(name = "init", description = "初始化项目JAVA-KWAIWU.md")
     static class InitCommand implements Callable<Integer> {
         @Option(names = {"-d", "--project"}, defaultValue = ".", description = "项目根目录")
         String projectDir;
@@ -198,7 +198,7 @@ public class CliMain implements Callable<Integer> {
 
         @Override
         public Integer call() {
-            System.out.printf("🚀 启动kwcode HTTP Server (端口: %d)%n", port);
+            System.out.printf("🚀 启动JAVA-kwcode HTTP Server (端口: %d)%n", port);
             System.out.println("   提示: 需设置 kwcode.server.enabled=true 激活REST端点");
             return 0;
         }
@@ -237,7 +237,7 @@ public class CliMain implements Callable<Integer> {
 
     public static void main(String[] args) {
         System.out.println(" java ai to code");
-        System.out.println("author 田保兴");
+        System.out.println("author tianbaoxing");
         int exitCode = new CommandLine(new CliMain()).execute(args);
         System.exit(exitCode);
     }
