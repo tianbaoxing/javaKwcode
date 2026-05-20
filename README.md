@@ -148,7 +148,7 @@ kwcode status        # 显示当前状态
 kwcode memory        # 查看项目记忆
 ```
 
-**断点 launch.json启动文件**：
+**断点 launch.json启动文件参数例子**：
 
 ```bash
 {
