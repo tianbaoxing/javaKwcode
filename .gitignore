@@ -29,3 +29,4 @@ id_rsa
 
 # Maven
 *.log
+test-output/
