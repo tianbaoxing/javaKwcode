@@ -148,6 +148,34 @@ kwcode status        # 显示当前状态
 kwcode memory        # 查看项目记忆
 ```
 
+**断点 launch.json启动文件**：
+
+```bash
+{
+            "type": "java",
+            "name": "CliMain",
+            "request": "launch",
+            "mainClass": "com.kwcode.cli.CliMain",
+            "projectName": "kwcode",
+            "env": {
+                "JAVA_HOME": "E:\\ai\\jdk-17.0.2",
+                "PATH": "E:\\ai\\jdk-17.0.2\\bin;E:\\ai\\node-v20.19.4-win-x64;E:\\ai\\apache-maven-3.9.12\\bin;${env:PATH}"
+            },
+            "vmArgs": "-Dfile.encoding=GBK -Dsun.jnu.encoding=GBK",
+            "args": [
+                "--ollama-url",
+                "https://openrouter.ai/api/v1",
+                "--api-key",
+                "sk-or-v1-秘钥key",
+                "-m",
+                "deepseek/deepseek-v4-pro",
+                "-d",
+                "E:\\ai\\aicode\\traeHome\\workHome\\kwcode\\testKwcode",
+                "-v"
+            ]
+        }
+```
+
 ### 配置
 
 配置文件位于 `src/main/resources/application.yml`：
@@ -289,4 +317,4 @@ MIT License
 
 ## Author
 
-田保兴
+tianbaoxing
