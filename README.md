@@ -91,6 +91,8 @@ KW-CODE 是一个确定性流水线驱动的 Coding Agent，核心理念是 **"�
 
 不同任务类型对应不同的专家序列：
 
+> 详细的专家体系、编排流程和意图识别机制请参阅 [专家体系与编排流程](docs/expert-pipeline-architecture.md)
+
 | 任务类型 | 专家序列 | 说明 |
 |----------|----------|------|
 | `codegen` | Generator → Verifier | 新代码生成 |
