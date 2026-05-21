@@ -368,13 +368,17 @@ public class EnvProber {
                 return null;
             }
 
-            return new EnvProbeResult(
+            EnvProbeResult loaded = new EnvProbeResult(
                 lang,
                 (Boolean) cache.getOrDefault("ready", false),
                 (List<String>) cache.getOrDefault("installed", List.of()),
                 testCmd,
                 (Boolean) cache.getOrDefault("rig_built", false)
             );
+            if (cache.containsKey("jdk_version")) loaded.setJdkVersion((String) cache.get("jdk_version"));
+            if (cache.containsKey("jdk_home")) loaded.setJdkHome((String) cache.get("jdk_home"));
+            if (cache.containsKey("maven_version")) loaded.setMavenVersion((String) cache.get("maven_version"));
+            return loaded;
         } catch (Exception e) { return null; }
     }
 
@@ -390,7 +394,11 @@ public class EnvProber {
             cache.put("installed", result.installed());
             cache.put("test_cmd", result.testCmd());
             cache.put("rig_built", result.rigBuilt());
+            if (result.jdkVersion() != null) cache.put("jdk_version", result.jdkVersion());
+            if (result.jdkHome() != null) cache.put("jdk_home", result.jdkHome());
+            if (result.mavenVersion() != null) cache.put("maven_version", result.mavenVersion());
             cache.put("cached_at", System.currentTimeMillis());
+            
             MAPPER.writeValue(cachePath.toFile(), cache);
         } catch (Exception e) {
             log.debug("[env] cache save failed: {}", e.getMessage());
