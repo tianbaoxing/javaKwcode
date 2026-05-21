@@ -175,6 +175,51 @@ kwcode memory        # 查看项目记忆
             ]
         }
 ```
+**断点 launch.json启动，例如：创建java类，实现string截取功能**：
+ java ai to code
+author tianbaoxing
+?JAVA-KW-CODE 交互模式 (输入 /help 查看命令, /quit 退出)
+   模型: deepseek/deepseek-v4-pro | 项目: E:\ai\aicode\traeHome\workHome\kwcode\testKwcode
+15:22:17.625 [main] INFO com.kwcode.server.PipelineFactory -- 构建kwcode pipeline: model=deepseek/deepseek-v4-pro, project=E:\ai\aicode\traeHome\workHome\kwcode\testKwcode
+-秘钥' '-m' 'deepseek/deepseek-v4-pro' '-d' 'E:\ai\aicode\traeHome\workHome\kwcode\testKwcode' '-v'
+ java ai to code
+author tianbaoxing
+?JAVA-KW-CODE 交互模式 (输入 /help 查看命令, /quit 退出)
+   模型: deepseek/deepseek-v4-pro | 项目: E:\ai\aicode\traeHome\workHome\kwcode\testKwcode
+15:22:17.625 [main] INFO com.kwcode.server.PipelineFactory -- 构建kwcode pipeline: model=deepseek/deepseek-v4-pro, project=E:\ai\aicode\traeHome\workHome\kwcode\testKwcode
+   模型: deepseek/deepseek-v4-pro | 项目: E:\ai\aicode\traeHome\workHome\kwcode\testKwcode
+15:22:17.625 [main] INFO com.kwcode.server.PipelineFactory -- 构建kwcode pipeline: model=deepseek/deepseek-v4-pro, project=E:\ai\aicode\traeHome\workHome\kwcode\testKwcode
+15:22:17.633 [main] INFO com.kwcode.server.PipelineFactory -- [pipeline] 创建OpenRouter ChatClient: baseUrl=https://openrouter.ai/api, model=deepseek/deepseek-v4-pro
+15:22:18.683 [main] INFO com.kwcode.llm.LLMService -- LLMService初始化完成（ChatClient模式，openRouter=true, ollama=false)
+15:22:18.711 [main] INFO com.kwcode.server.PipelineFactory -- kwcode pipeline构建完成
+
+> 创建java类，实现string截取功能
+
+? 路由到专家: {expert_type=codegen, task_summary=创建java类，实现, difficulty=easy, routing_source=keyword, confidence=0.75, needs_search=false, subtask_hint=, expert_name=null, route_type=general}
+15:22:59.085 [main] INFO com.kwcode.core.orchestrator.PipelineOrchestrator -- [orchestrator] Gate结果 → expertType=codegen
+15:22:59.085 [main] INFO com.kwcode.core.orchestrator.PipelineOrchestrator -- [orchestrator] Gate结果 → difficulty=easy
+15:22:59.086 [main] INFO com.kwcode.core.orchestrator.PipelineOrchestrator -- [orchestrator] Gate结果 → systemPrompt=
+15:22:59.086 [main] INFO com.kwcode.core.orchestrator.PipelineOrchestrator -- [orchestrator] model from defaultModelName: deepseek/deepseek-v4-pro (gateResult has no model)
+15:22:59.093 [main] INFO com.kwcode.core.ThinkConfig -- [think_config] autoConfigure: model=deepseek/deepseek-v4-pro isReasoning=false → MODE_NEVER (expertType=codegen difficulty=easy)   
+  [env_probe] 检测项目环境...
+  [env_probe]   语言: java
+  [env_probe]   就绪: true
+  [env_probe]   已安装: []
+  [env_probe]   测试命令:
+  [pre_test] 运行初始测试获取基线...
+  [gate] 任务类型：codegen | 序列：[generator, verifier]
+15:22:59.191 [main] INFO com.kwcode.core.orchestrator.PipelineOrchestrator -- [orchestrator] model strategy: model=deepseek/deepseek-v4-pro tier=大模型模式 strategyMaxRetries=3 forcePlanMode=false
+  [generator] 生成代码修改...
+15:22:59.197 [orchestrator-watchdog] INFO com.kwcode.experts.Generator -- [generator] inferLanguageHint from userInput: Java
+15:23:34.214 [orchestrator-watchdog] INFO com.kwcode.experts.Generator -- [generator] produced 1 patches
+  [verifier] 验证修改结果...
+15:23:34.216 [orchestrator-watchdog] INFO com.kwcode.tools.ToolExecutor -- [apply_patch] creating new file: filePath='SubstringUtil.java' resolved='E:\ai\aicode\traeHome\workHome\kwcode\testKwcode\SubstringUtil.java' parentExists=true
+15:23:34.221 [orchestrator-watchdog] INFO com.kwcode.tools.ToolExecutor -- Wrote 725 bytes to E:\ai\aicode\traeHome\workHome\kwcode\testKwcode\SubstringUtil.java
+15:23:34.223 [orchestrator-watchdog] INFO com.kwcode.experts.Verifier -- [verifier] Java project has no pom.xml, skipping mvn test cmd
+15:23:34.223 [orchestrator-watchdog] INFO com.kwcode.experts.Verifier -- [verifier] passed=true, syntax=true, tests=0/0, patches=1/1
+  [passed] 验证通过！
+15:23:34.226 [orchestrator-watchdog] INFO com.kwcode.core.orchestrator.PipelineOrchestrator -- [orchestrator] 任务成功，耗时35141ms，重试0次
+? 完成
 
 ### 配置
 
