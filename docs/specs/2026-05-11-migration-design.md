@@ -213,17 +213,17 @@ $env:Path = "E:\ai\jdk-17.0.2\bin;E:\ai\node-v20.19.4-win-x64;E:\ai\apache-maven
 
 | Python 文件 | Python 类/核心 | Java 类 | 包路径 |
 |-------------|---------------|---------|--------|
-| project_md.py | ProjectMemory | ProjectMemory | com.kwcode.memory |
-| pattern_md.py | PatternMemory | PatternMemory | com.kwcode.memory |
-| expert_md.py | ExpertMemory | ExpertMemory | com.kwcode.memory |
+| project_md.py | ProjectMemory | ProjectMd | com.kwcode.memory |
+| pattern_md.py | PatternMemory | PatternMd | com.kwcode.memory |
+| expert_md.py | ExpertMemory | ExpertMd | com.kwcode.memory |
 | kaiwu_md.py | KaiwuMemory | KaiwuMemory | com.kwcode.memory |
-| session_md.py | SessionMemory | SessionMemory | com.kwcode.memory |
+| session_md.py | SessionMemory | SessionMd | com.kwcode.memory |
 
 ### 3.7 Search 模块
 
 | Python 文件 | Python 类/核心 | Java 类 | 包路径 |
 |-------------|---------------|---------|--------|
-| duckduckgo.py | DuckDuckGoClient | DuckDuckGoClient | com.kwcode.search |
+| duckduckgo.py | DuckDuckGoClient | DuckDuckGoSearch | com.kwcode.search |
 | content_fetcher.py | ContentFetcher | ContentFetcher | com.kwcode.search |
 | context_compressor.py | ContextCompressor | ContextCompressor | com.kwcode.search |
 | quality_filter.py | QualityFilter | QualityFilter | com.kwcode.search |
@@ -247,8 +247,8 @@ $env:Path = "E:\ai\jdk-17.0.2\bin;E:\ai\node-v20.19.4-win-x64;E:\ai\apache-maven
 |-------------|---------------|---------|--------|
 | executor.py | ToolExecutor | ToolGateway | com.kwcode.tools |
 | tool_gateway.py | ToolGateway | ToolGateway | com.kwcode.tools |
-| ast_utils.py | ASTUtils | ASTUtils | com.kwcode.tools |
-| hashline.py | HashLine | HashLine | com.kwcode.tools |
+| ast_utils.py | ASTUtils | AstUtils | com.kwcode.tools |
+| hashline.py | HashLine | Hashline | com.kwcode.tools |
 | import_fixer.py | ImportFixer | ImportFixer | com.kwcode.tools |
 | ssh_session.py | SSHSession | SSHSession | com.kwcode.tools |
 
@@ -263,9 +263,9 @@ $env:Path = "E:\ai\jdk-17.0.2\bin;E:\ai\node-v20.19.4-win-x64;E:\ai\apache-maven
 | notification/flywheel_notifier.py | FlywheelNotifier | FlywheelNotifier | com.kwcode.notification |
 | stats/value_tracker.py | ValueTracker | ValueTracker | com.kwcode.stats |
 | telemetry/client.py | TelemetryClient | TelemetryClient | com.kwcode.telemetry |
-| server/app.py | FastAPI App | KwcodeServer | com.kwcode.server |
-| server/models.py | API Models | ApiModels | com.kwcode.server |
-| cli/main.py | CLI App | KwcodeCLI | com.kwcode.cli |
+| server/app.py | FastAPI App | ServerController | com.kwcode.server |
+| server/models.py | API Models | Models | com.kwcode.server |
+| cli/main.py | CLI App | CliMain | com.kwcode.cli |
 
 ---
 
@@ -378,18 +378,18 @@ E:\ai\aicode\traeHome\workHome\kwcode\javaKwcode\
 │   │   │   │   ├── Parser.java
 │   │   │   │   ├── CallGraph.java, CallGraphNode.java
 │   │   │   │   ├── ASTLocator.java
-│   │   │   │   ├── GraphBuilder.java
+│   │   │   │   ├── CallGraphBuilder.java
 │   │   │   │   ├── GraphRetriever.java
 │   │   │   │   ├── LanguageDetector.java
 │   │   │   │   ├── Language.java (枚举)
 │   │   │   │   └── AstGrepEngine.java
 │   │   │   │
 │   │   │   ├── memory/
-│   │   │   │   ├── ProjectMemory.java
-│   │   │   │   ├── PatternMemory.java
-│   │   │   │   ├── ExpertMemory.java
+│   │   │   │   ├── ProjectMd.java
+│   │   │   │   ├── PatternMd.java
+│   │   │   │   ├── ExpertMd.java
 │   │   │   │   ├── KaiwuMemory.java
-│   │   │   │   └── SessionMemory.java
+│   │   │   │   └── SessionMd.java
 │   │   │   │
 │   │   │   ├── flywheel/
 │   │   │   │   ├── FlywheelManager.java
@@ -410,7 +410,7 @@ E:\ai\aicode\traeHome\workHome\kwcode\javaKwcode\
 │   │   │   │
 │   │   │   ├── search/
 │   │   │   │   ├── SearchRouter.java
-│   │   │   │   ├── DuckDuckGoClient.java
+│   │   │   │   ├── DuckDuckGoSearch.java
 │   │   │   │   ├── ContentFetcher.java
 │   │   │   │   ├── IntentClassifier.java
 │   │   │   │   ├── QueryGenerator.java
@@ -433,8 +433,8 @@ E:\ai\aicode\traeHome\workHome\kwcode\javaKwcode\
 │   │   │   │   ├── BashExecutor.java
 │   │   │   │   ├── DirectoryLister.java
 │   │   │   │   ├── GitHelper.java
-│   │   │   │   ├── ASTUtils.java
-│   │   │   │   ├── HashLine.java
+│   │   │   │   ├── AstUtils.java
+│   │   │   │   ├── Hashline.java
 │   │   │   │   ├── ImportFixer.java
 │   │   │   │   └── SSHSession.java
 │   │   │   │
@@ -464,8 +464,8 @@ E:\ai\aicode\traeHome\workHome\kwcode\javaKwcode\
 │   │   │   │   ├── Gap.java
 │   │   │   │   └── ValidationResult.java
 │   │   │   │
-│   │   │   ├── cli/KwcodeCLI.java
-│   │   │   └── server/KwcodeServer.java
+│   │   │   ├── cli/CliMain.java
+│   │   │   └── server/ServerController.java
 │   │   │
 │   │   └── resources/
 │   │       ├── application.yml
