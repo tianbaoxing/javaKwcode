@@ -110,7 +110,10 @@ public class LLMService {
         Prompt promptObj = new Prompt(messages);
         var response = getActiveClient().call(promptObj);
         String content = response.getResult().getOutput().getContent();
-
+        log.info("LLM请求 - Provider: {}, 模型: {}, 输入长度: {}", provider, model, prompt.length());
+        log.info("LLM请求内容: {}", prompt);
+        log.info("LLM响应 - 输出长度: {}", content.length());
+        log.info("LLM响应内容: {}", content);
         trackTokens(prompt.length() / 4, content.length() / 4);
         return content;
     }
