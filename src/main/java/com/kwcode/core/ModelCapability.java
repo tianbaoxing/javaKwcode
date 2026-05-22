@@ -117,7 +117,7 @@ public class ModelCapability {
 
         STRATEGIES.put(Tier.SMALL, new ModelStrategy(Tier.SMALL, 0.90, true, 2, 5, 1, 1, 2));
         STRATEGIES.put(Tier.MEDIUM, new ModelStrategy(Tier.MEDIUM, 0.80, false, 4, 10, 3, 2, 4));
-        STRATEGIES.put(Tier.LARGE, new ModelStrategy(Tier.LARGE, 0.70, false, 8, 20, 3, 2, 8));
+        STRATEGIES.put(Tier.LARGE, new ModelStrategy(Tier.LARGE, 0.70, false, 8, 20, 5, 2, 8));
     }
 
     private static final Map<String, Integer> CLOUD_CTX = Map.ofEntries(

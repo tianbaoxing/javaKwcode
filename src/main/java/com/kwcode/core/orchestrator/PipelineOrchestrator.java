@@ -45,8 +45,8 @@ public class PipelineOrchestrator {
 
     private static final Logger log = LoggerFactory.getLogger(PipelineOrchestrator.class);
 
-    public static final int MAX_RETRIES = 3;
-    public static final int HARD_MAX_RETRIES = 4;
+    public static final int MAX_RETRIES = 5;
+    public static final int HARD_MAX_RETRIES = 10;
     public static final int FREE_SYNTAX_RETRIES = 2;
     public static final int TASK_TIMEOUT_SECONDS = 300;
 
