@@ -2,6 +2,7 @@ package com.kwcode.cli;
 
 import com.kwcode.server.PipelineFactory;
 import com.kwcode.core.orchestrator.PipelineOrchestrator;
+import com.kwcode.core.env.EnvProber;
 import com.kwcode.core.gate.Gate;
 import com.kwcode.memory.KaiwuMemory;
 import com.kwcode.registry.ExpertRegistry;
@@ -142,12 +143,28 @@ public class CliMain implements Callable<Integer> {
                 System.out.println("  /quit  - 退出");
                 System.out.println("  /model - 显示当前模型");
                 System.out.println("  /stats - 显示Token统计");
+                System.out.println("  /memory - 显示项目记忆");
+                System.out.println("  /env - 显示环境变量");
                 continue;
             }
             if (input.equals("/model")) {
                 System.out.println("  " + bundle.getLlmService().getModelName());
                 continue;
             }
+
+            if(input.equals("/memory")){
+                 KaiwuMemory memory = new KaiwuMemory();
+                 System.out.println(memory.show(projectDir));
+                 continue;
+            }
+
+             if(input.equals("/env")){
+                EnvProber envProber = new EnvProber();
+                 Map<String, Object> envResult = envProber.probeAndFix(projectDir).toMap();
+                 System.out.println(envResult.toString());
+                 continue;
+            }
+
             if (input.equals("/stats")) {
                 System.out.println("  " + bundle.getLlmService().getTokenUsage());
                 continue;
@@ -216,7 +233,7 @@ public class CliMain implements Callable<Integer> {
     static class StatusCommand implements Callable<Integer> {
         @Override
         public Integer call() {
-            System.out.println("  kwcode v1.0.0-SNAPSHOT");
+            System.out.println("  JAVA-kwcode v1.0.0-SNAPSHOT");
             System.out.println("  Java版 Coding Agent");
             return 0;
         }
