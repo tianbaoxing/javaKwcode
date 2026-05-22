@@ -112,6 +112,7 @@ KW-CODE 是一个确定性流水线驱动的 Coding Agent，核心理念是 **"�
 | [Locator 定位器架构](docs/locator-architecture.md) | BM25+调用图两阶段定位、检索策略与记忆飞轮 |
 | [Generator 生成器架构](docs/generator-architecture.md) | 提示词构建、三阶段重试、补丁解析与语言推断 |
 | [Git 仓库初始化指南](docs/git-setup-guide.md) | 仓库初始化、.gitignore 配置与安全检查清单 |
+| [模型能力检测架构](docs/model-capability-architecture.md) | 模型Tier检测链、策略参数与上下文推断 |
 
 ## 快速开始
 
