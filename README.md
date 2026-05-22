@@ -103,6 +103,16 @@ KW-CODE 是一个确定性流水线驱动的 Coding Agent，核心理念是 **"�
 | `vision` | VisionExpert | 图片理解 |
 | `office` | OfficeHandler | Office 文档处理 |
 
+### 详细文档
+
+| 文档 | 说明 |
+|------|------|
+| [专家体系与编排流程](docs/expert-pipeline-architecture.md) | 专家流水线架构、意图识别与编排机制 |
+| [环境探测架构](docs/env-prober-architecture.md) | EnvProber 探测方法、数据存储与缓存机制 |
+| [Locator 定位器架构](docs/locator-architecture.md) | BM25+调用图两阶段定位、检索策略与记忆飞轮 |
+| [Generator 生成器架构](docs/generator-architecture.md) | 提示词构建、三阶段重试、补丁解析与语言推断 |
+| [Git 仓库初始化指南](docs/git-setup-guide.md) | 仓库初始化、.gitignore 配置与安全检查清单 |
+
 ## 快速开始
 
 ### 环境要求
