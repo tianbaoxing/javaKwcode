@@ -70,8 +70,14 @@ public class Verifier {
         String errorType = "";
 
         if (testCmd != null && !testCmd.isEmpty()) {
+            log.info("[verifier] running test: cmd='{}' projectRoot={}", testCmd, ctx.projectRoot);
             var result = tools.runBash(testCmd, ctx.projectRoot, 120);
             testOutput = result.stdout() + "\n" + result.stderr();
+            log.info("[verifier] test result: returnCode={}, stdout={} chars, stderr={} chars",
+                result.returnCode(),
+                result.stdout() != null ? result.stdout().length() : 0,
+                result.stderr() != null ? result.stderr().length() : 0);
+            log.info("[verifier] test output:\n{}", testOutput.length() > 2000 ? testOutput.substring(0, 2000) + "\n...(truncated)" : testOutput);
 
             if (testOutput.contains("passed")) {
                 testsPassed = extractNumber(testOutput, "(\\d+) passed");
