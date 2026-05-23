@@ -133,8 +133,10 @@ public class PipelineOrchestrator {
         ctx.modelTier = (String) cap.getOrDefault("tier", "medium");
         ctx.effectiveCtx = ((Number) cap.getOrDefault("effective_ctx", 32768)).intValue();
 
-        // ── 记忆加载 ──
+        // ── 记忆初始化与加载 ──
         if (memory != null) {
+            // 自动初始化.kaiwu/目录和PROJECT.md（与Python行为一致）
+            memory.init(projectRoot);
             ctx.kaiwuMemory = memory.load(projectRoot);
         }
 
@@ -513,12 +515,22 @@ public class PipelineOrchestrator {
 
     private OrchestratorResult recordSuccess(TaskContext ctx, long elapsedMs) {
         log.info("[orchestrator] 任务成功，耗时{}ms，重试{}次", elapsedMs, ctx.retryCount);
+        // 写入三层记忆（project_md, expert_md, pattern_md）
+        if (memory != null) {
+            double elapsedSec = elapsedMs / 1000.0;
+            memory.save(ctx.projectRoot, ctx, elapsedSec);
+        }
         return new OrchestratorResult(true, ctx, null, elapsedMs);
     }
 
     private OrchestratorResult recordFailure(TaskContext ctx, int maxRetries, long elapsedMs) {
         String error = "重试" + ctx.retryCount + "次后仍失败";
         log.warn("[orchestrator] 任务失败：{}", error);
+        // 写入失败记忆（只有pattern_md追踪失败）
+        if (memory != null) {
+            double elapsedSec = elapsedMs / 1000.0;
+            memory.saveFailure(ctx.projectRoot, ctx, elapsedSec);
+        }
         return new OrchestratorResult(false, ctx, error, elapsedMs);
     }
 
