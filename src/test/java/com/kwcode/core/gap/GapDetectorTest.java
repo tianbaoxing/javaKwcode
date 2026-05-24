@@ -216,12 +216,12 @@ class GapDetectorTest {
     }
 
     @Test
-    @DisplayName("compute: ChatClient不可用 → ENVIRONMENT")
+    @DisplayName("compute: ChatModel不可用 → ENVIRONMENT")
     void testComputeLlmChatClientFailure() {
-        var gap = detector.compute("没有可用的ChatClient，请确保Spring AI配置正确", ".");
+        var gap = detector.compute("没有可用的ChatModel，请确保Spring AI配置正确", ".");
         assertEquals(GapDetector.GapType.ENVIRONMENT, gap.gapType());
         assertEquals(0.95, gap.confidence(), 0.01);
-        assertTrue(gap.suggestion().contains("ChatClient"));
+        assertTrue(gap.suggestion().contains("ChatModel"));
     }
 
     @Test

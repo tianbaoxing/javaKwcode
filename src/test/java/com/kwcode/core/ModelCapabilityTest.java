@@ -164,10 +164,10 @@ class ModelCapabilityTest {
     }
 
     @Test
-    @DisplayName("getStrategy: LARGE tier允许maxRetries=3")
+    @DisplayName("getStrategy: LARGE tier允许maxRetries=5")
     void testStrategyLarge() {
         var s = ModelCapability.getStrategy(ModelCapability.Tier.LARGE);
-        assertEquals(3, s.maxRetries);
+        assertEquals(5, s.maxRetries);
         assertFalse(s.forcePlanMode);
     }
 

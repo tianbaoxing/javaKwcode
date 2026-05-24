@@ -2,13 +2,12 @@ package com.kwcode.llm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -18,15 +17,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * LLM统一后端：基于Spring AI ChatClient实现
+ * LLM统一后端：基于Spring AI ChatModel实现
  * 对应Python: kaiwu/llm/llama_backend.py LLMBackend
  *
- * <p>设计规则合规：
+ * <p>Spring AI 1.0.0 API变更：
  * <ul>
- *   <li>✅ 统一接口抽象：通过Spring AI ChatClient统一访问LLM</li>
- *   <li>✅ 依赖注入管理：通过Spring DI管理ChatClient实例</li>
- *   <li>✅ 配置化参数：URL/Key/Model通过application.yml管理</li>
- *   <li>✅ 多Provider支持：OpenRouter + Ollama</li>
+ *   <li>ChatClient → ChatModel（旧ChatClient重命名为ChatModel）</li>
+ *   <li>call()方法签名不变</li>
  * </ul>
  *
  * @origin kaiwu/llm/llama_backend.py::LLMBackend
@@ -42,8 +39,8 @@ public class LLMBackend {
 
     private static final Pattern THINKING_PATTERN = Pattern.compile("<think.*?>.*?</think >", Pattern.DOTALL);
 
-    private ChatClient openRouterClient;
-    private ChatClient ollamaClient;
+    private ChatModel openRouterModel;
+    private ChatModel ollamaModel;
     private String defaultProvider = "openrouter";
     private String defaultModel = "deepseek/deepseek-chat-v3-0324";
 
@@ -55,14 +52,15 @@ public class LLMBackend {
     private double lastElapsed = 0.0;
 
     /**
-     * Spring环境构造器：自动注入ChatClient
+     * Spring环境构造器：自动注入ChatModel
+     * Spring AI 1.0.0: ChatClient → ChatModel
      */
     @Autowired
     public LLMBackend(
-            @Qualifier("openRouterChatClient") ChatClient openRouterClient,
-            @Qualifier("ollamaChatClient") ChatClient ollamaClient) {
-        this.openRouterClient = openRouterClient;
-        this.ollamaClient = ollamaClient;
+            @Qualifier("openRouterChatModel") ChatModel openRouterModel,
+            @Qualifier("ollamaChatModel") ChatModel ollamaModel) {
+        this.openRouterModel = openRouterModel;
+        this.ollamaModel = ollamaModel;
         log.info("LLMBackend初始化（Spring AI模式）: provider={}, model={}", defaultProvider, defaultModel);
     }
 
@@ -70,9 +68,9 @@ public class LLMBackend {
      * 兼容模式构造器（用于测试或非Spring环境）
      */
     public LLMBackend() {
-        this.openRouterClient = null;
-        this.ollamaClient = null;
-        log.info("LLMBackend初始化（兼容模式，无ChatClient）");
+        this.openRouterModel = null;
+        this.ollamaModel = null;
+        log.info("LLMBackend初始化（兼容模式，无ChatModel）");
     }
 
     public void setDefaultProvider(String provider) {
@@ -83,14 +81,14 @@ public class LLMBackend {
         this.defaultModel = model;
     }
 
-    private ChatClient getActiveClient() {
-        if ("ollama".equalsIgnoreCase(defaultProvider) && ollamaClient != null) {
-            return ollamaClient;
+    private ChatModel getActiveModel() {
+        if ("ollama".equalsIgnoreCase(defaultProvider) && ollamaModel != null) {
+            return ollamaModel;
         }
-        if (openRouterClient != null) {
-            return openRouterClient;
+        if (openRouterModel != null) {
+            return openRouterModel;
         }
-        throw new IllegalStateException("没有可用的ChatClient，请确保Spring AI配置正确");
+        throw new IllegalStateException("没有可用的ChatModel，请确保Spring AI配置正确");
     }
 
     // ── generate：单轮文本补全 ──
@@ -109,8 +107,8 @@ public class LLMBackend {
         messages.add(new UserMessage(prompt));
 
         Prompt promptObj = new Prompt(messages);
-        var response = getActiveClient().call(promptObj);
-        String content = response.getResult().getOutput().getContent();
+        var response = getActiveModel().call(promptObj);
+        String content = response.getResult().getOutput().getText();
 
         lastElapsed = (System.nanoTime() - t0) / 1_000_000_000.0;
 
@@ -153,8 +151,8 @@ public class LLMBackend {
                 .collect(Collectors.toList());
 
         Prompt promptObj = new Prompt(chatMessages);
-        var response = getActiveClient().call(promptObj);
-        String content = response.getResult().getOutput().getContent();
+        var response = getActiveModel().call(promptObj);
+        String content = response.getResult().getOutput().getText();
 
         lastElapsed = (System.nanoTime() - t0) / 1_000_000_000.0;
 

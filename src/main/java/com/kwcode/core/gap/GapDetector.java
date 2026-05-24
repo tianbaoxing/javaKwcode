@@ -372,7 +372,9 @@ public class GapDetector {
 
     private boolean matchLlmFailure(String output) {
         String[] patterns = {
+            "没有可用的ChatModel",
             "没有可用的ChatClient",
+            "ChatModel",
             "ChatClient",
             "LLM call failed",
             "LLM调用失败",
@@ -393,7 +395,8 @@ public class GapDetector {
 
     private Gap buildLlmFailureGap(String output) {
         String reason = "LLM服务不可用";
-        if (output.contains("ChatClient")) reason = "ChatClient未配置，请检查Spring AI配置";
+        if (output.contains("ChatModel")) reason = "ChatModel未配置，请检查Spring AI配置";
+        else if (output.contains("ChatClient")) reason = "ChatClient未配置，请检查Spring AI配置";
         else if (output.contains("API key") || output.contains("api_key")) reason = "API密钥未配置";
         else if (output.contains("Connection refused")) reason = "LLM服务连接被拒绝";
         else if (output.contains("timed out")) reason = "LLM服务连接超时";

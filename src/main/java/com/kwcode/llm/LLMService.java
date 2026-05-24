@@ -2,7 +2,7 @@ package com.kwcode.llm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -20,16 +20,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * LLM服务层：提供按专家路由的模型选择，基于Spring AI ChatClient
+ * LLM服务层：提供按专家路由的模型选择，基于Spring AI ChatModel
  * 不同专家可使用不同模型（如Locator用快模型，Generator用强模型）
  *
- * <p>设计规则合规：
+ * <p>Spring AI 1.0.0 API变更：
  * <ul>
- *   <li>✅ 统一接口抽象：通过Spring AI ChatClient统一访问LLM</li>
- *   <li>✅ 依赖注入管理：通过Spring DI管理ChatClient实例</li>
- *   <li>✅ 配置化参数：URL/Key/Model通过application.yml管理</li>
- *   <li>✅ 多Provider支持：OpenRouter + Ollama</li>
- *   <li>✅ 任务级模型路由：不同专家类型使用不同模型</li>
+ *   <li>ChatClient → ChatModel（旧ChatClient重命名为ChatModel）</li>
+ *   <li>call()方法签名不变</li>
  * </ul>
  *
  * @origin kaiwu/server/pipeline_factory.py (LLM构建部分)
@@ -39,8 +36,8 @@ public class LLMService {
 
     private static final Logger log = LoggerFactory.getLogger(LLMService.class);
 
-    private final ChatClient openRouterClient;
-    private final ChatClient ollamaClient;
+    private final ChatModel openRouterModel;
+    private final ChatModel ollamaModel;
     private final ModelRouter modelRouter;
 
     private int totalInputTokens = 0;
@@ -50,21 +47,21 @@ public class LLMService {
 
     /**
      * 完整构造器（Spring注入和CLI手动创建共用）
-     * Spring通过@Qualifier注入，CLI通过PipelineFactory手动创建
+     * Spring AI 1.0.0: ChatClient → ChatModel
      */
     @Autowired
     public LLMService(
-            @Qualifier("openRouterChatClient") ChatClient openRouterClient,
-            @Qualifier("ollamaChatClient") ChatClient ollamaClient,
+            @Qualifier("openRouterChatModel") ChatModel openRouterModel,
+            @Qualifier("ollamaChatModel") ChatModel ollamaModel,
             ModelRouter modelRouter) {
-        this.openRouterClient = openRouterClient;
-        this.ollamaClient = ollamaClient;
+        this.openRouterModel = openRouterModel;
+        this.ollamaModel = ollamaModel;
         this.modelRouter = modelRouter;
-        if (openRouterClient != null || ollamaClient != null) {
-            log.info("LLMService初始化完成（ChatClient模式，openRouter={}, ollama={})",
-                openRouterClient != null, ollamaClient != null);
+        if (openRouterModel != null || ollamaModel != null) {
+            log.info("LLMService初始化完成（ChatModel模式，openRouter={}, ollama={})",
+                openRouterModel != null, ollamaModel != null);
         } else {
-            log.info("LLMService初始化完成（兼容模式，无ChatClient）");
+            log.info("LLMService初始化完成（兼容模式，无ChatModel）");
         }
     }
 
@@ -75,15 +72,15 @@ public class LLMService {
         this(null, null, modelRouter);
     }
 
-    private ChatClient getActiveClient() {
+    private ChatModel getActiveModel() {
         String provider = modelRouter.getProvider();
-        if ("ollama".equalsIgnoreCase(provider) && ollamaClient != null) {
-            return ollamaClient;
+        if ("ollama".equalsIgnoreCase(provider) && ollamaModel != null) {
+            return ollamaModel;
         }
-        if (openRouterClient != null) {
-            return openRouterClient;
+        if (openRouterModel != null) {
+            return openRouterModel;
         }
-        throw new IllegalStateException("没有可用的ChatClient，请确保Spring AI配置正确");
+        throw new IllegalStateException("没有可用的ChatModel，请确保Spring AI配置正确");
     }
 
     /**
@@ -108,8 +105,8 @@ public class LLMService {
         messages.add(new UserMessage(prompt));
 
         Prompt promptObj = new Prompt(messages);
-        var response = getActiveClient().call(promptObj);
-        String content = response.getResult().getOutput().getContent();
+        var response = getActiveModel().call(promptObj);
+        String content = response.getResult().getOutput().getText();
         log.info("LLM请求 - Provider: {}, 模型: {}, 输入长度: {}", provider, model, prompt.length());
         log.info("LLM请求内容: {}", prompt);
         log.info("LLM响应 - 输出长度: {}", content.length());
@@ -147,8 +144,8 @@ public class LLMService {
                 .collect(Collectors.toList());
 
         Prompt promptObj = new Prompt(chatMessages);
-        var response = getActiveClient().call(promptObj);
-        String content = response.getResult().getOutput().getContent();
+        var response = getActiveModel().call(promptObj);
+        String content = response.getResult().getOutput().getText();
 
         trackTokens(
                 messages.stream().mapToInt(m -> m.get("content").length() / 4).sum(),

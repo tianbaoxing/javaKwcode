@@ -24,11 +24,11 @@ import com.kwcode.tools.ToolGateway;
 import com.kwcode.audit.AuditLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.openai.OpenAiChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.ollama.OllamaChatClient;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 
 import java.util.*;
@@ -37,6 +37,13 @@ import java.util.*;
  * 流水线工厂：构建完整的kwcode处理管线
  * CLI和Server共享此工厂创建pipeline实例
  * 对应Python: kaiwu/server/pipeline_factory.py::build_pipeline
+ *
+ * <p>Spring AI 1.0.0 API变更：
+ * <ul>
+ *   <li>ChatClient → ChatModel</li>
+ *   <li>OpenAiChatClient → OpenAiChatModel</li>
+ *   <li>OllamaChatClient → OllamaChatModel</li>
+ * </ul>
  *
  * @origin kaiwu/server/pipeline_factory.py::build_pipeline
  */
@@ -65,9 +72,10 @@ public class PipelineFactory {
             modelRouter.setModelRouter(routerMap);
         }
 
-        // 2. LLM服务（手动创建ChatClient，支持CLI非Spring环境）
-        ChatClient openRouterClient = null;
-        ChatClient ollamaClient = null;
+        // 2. LLM服务（手动创建ChatModel，支持CLI非Spring环境）
+        // Spring AI 1.0.0: ChatClient → ChatModel, OpenAiChatClient → OpenAiChatModel
+        ChatModel openRouterModel = null;
+        ChatModel ollamaModel = null;
 
         if (config.getApiKey() != null && !config.getApiKey().isBlank()) {
             String baseUrl = config.getOllamaUrl();
@@ -78,23 +86,33 @@ public class PipelineFactory {
                 baseUrl = baseUrl.substring(0, baseUrl.length() - 3);
                 log.info("[pipeline] 修正baseUrl: 移除末尾/v1（OpenAiApi会自动追加/v1/chat/completions）");
             }
-            log.info("[pipeline] 创建OpenRouter ChatClient: baseUrl={}, model={}", baseUrl, config.getModel());
-            OpenAiApi api = new OpenAiApi(baseUrl, config.getApiKey());
-            OpenAiChatOptions options = OpenAiChatOptions.builder()
-                    .withModel(config.getModel())
-                    .withTemperature(0.1f)
+            log.info("[pipeline] 创建OpenRouter ChatModel: baseUrl={}, model={}", baseUrl, config.getModel());
+            OpenAiApi api = OpenAiApi.builder()
+                    .baseUrl(baseUrl)
+                    .apiKey(config.getApiKey())
                     .build();
-            openRouterClient = new OpenAiChatClient(api, options);
+            OpenAiChatOptions options = OpenAiChatOptions.builder()
+                    .model(config.getModel())
+                    .temperature(0.1)
+                    .build();
+            openRouterModel = OpenAiChatModel.builder()
+                    .openAiApi(api)
+                    .defaultOptions(options)
+                    .build();
         }
 
         if (config.getOllamaUrl() != null && !config.getOllamaUrl().isBlank()
             && !config.getOllamaUrl().contains("openrouter.ai")) {
-            log.info("[pipeline] 创建Ollama ChatClient: url={}", config.getOllamaUrl());
-            OllamaApi ollamaApi = new OllamaApi(config.getOllamaUrl());
-            ollamaClient = new OllamaChatClient(ollamaApi);
+            log.info("[pipeline] 创建Ollama ChatModel: url={}", config.getOllamaUrl());
+            OllamaApi ollamaApi = OllamaApi.builder()
+                    .baseUrl(config.getOllamaUrl())
+                    .build();
+            ollamaModel = OllamaChatModel.builder()
+                    .ollamaApi(ollamaApi)
+                    .build();
         }
 
-        LLMService llmService = new LLMService(openRouterClient, ollamaClient, modelRouter);
+        LLMService llmService = new LLMService(openRouterModel, ollamaModel, modelRouter);
 
         // 3. 工具网关
         ToolExecutor toolExecutor = new ToolExecutor(config.getProjectRoot());

@@ -192,10 +192,10 @@ class PipelineOrchestratorTest {
     }
 
     @Test
-    @DisplayName("常量: MAX_RETRIES=3, HARD_MAX_RETRIES=4, FREE_SYNTAX_RETRIES=2")
+    @DisplayName("常量: MAX_RETRIES=5, HARD_MAX_RETRIES=10, FREE_SYNTAX_RETRIES=2")
     void testConstants() {
-        assertEquals(3, PipelineOrchestrator.MAX_RETRIES);
-        assertEquals(4, PipelineOrchestrator.HARD_MAX_RETRIES);
+        assertEquals(5, PipelineOrchestrator.MAX_RETRIES);
+        assertEquals(10, PipelineOrchestrator.HARD_MAX_RETRIES);
         assertEquals(2, PipelineOrchestrator.FREE_SYNTAX_RETRIES);
     }
 
