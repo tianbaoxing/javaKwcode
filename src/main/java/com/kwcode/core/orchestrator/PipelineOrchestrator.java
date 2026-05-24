@@ -371,7 +371,8 @@ public class PipelineOrchestrator {
             List<String> retrySequence = retryStrat.sequence();
             sequence = retrySequence;
 
-            // 构建重试提示
+            // 构建重试提示（将上次错误信息传递给Generator，使LLM在重试时能看到失败原因）
+            ctx.previousFailure = ctx.verifierOutput != null ? ctx.verifierOutput.errorDetail() : "";
             ctx.retryHint = buildRetryHint(ctx, currentErrorType);
             if (winkHint != null && !winkHint.isEmpty()) {
                 ctx.retryHint = (ctx.retryHint + "\n" + winkHint).strip();
