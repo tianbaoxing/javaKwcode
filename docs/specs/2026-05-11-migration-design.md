@@ -712,3 +712,13 @@ Python版（生产）          Java版（开发中）
 | GAP_CONFIDENCE_THRESHOLD | 0.7 | `static final double GAP_CONFIDENCE_THRESHOLD = 0.7` |
 | SYNTAX_FREE_RETRIES | 2 | `static final int SYNTAX_FREE_RETRIES = 2` |
 | SAME_ERROR_STREAK | 3 | `static final int SAME_ERROR_STREAK = 3` |
+
+---
+
+## 附录C：待解决问题
+
+### C.1 跨文件编译错误定位问题
+
+**场景描述**：修改A类后编译，A类本身没有语法错误，但B类因为依赖A类的接口/签名而报编译错误。此时 Verifier 返回的错误上下文片段全部是A类的代码，但实际错误在B类。
+
+
