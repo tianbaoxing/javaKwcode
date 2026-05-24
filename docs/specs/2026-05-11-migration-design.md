@@ -239,7 +239,7 @@ $env:Path = "E:\ai\jdk-17.0.2\bin;E:\ai\node-v20.19.4-win-x64;E:\ai\apache-maven
 | Python 文件 | Python 类/核心 | Java 类 | 包路径 |
 |-------------|---------------|---------|--------|
 | llama_backend.py | LlamaBackend | LLMService, ModelRouter, ProviderConfig | com.kwcode.llm |
-| (Spring AI) | - | ChatClient, PromptTemplate | com.kwcode.llm |
+| (Spring AI) | - | ChatModel, SpringAIChatClient | com.kwcode.llm |
 
 ### 3.9 Tools 模块
 
@@ -552,31 +552,27 @@ kwcode:
 @Service
 public class LLMService {
 
-    @Qualifier("openRouterChatClient")
-    private final ChatClient openRouterClient;
+    @Qualifier("openRouterChatModel")
+    private final ChatModel openRouterModel;
 
-    @Qualifier("ollamaChatClient")
-    private final ChatClient ollamaClient;
+    @Qualifier("ollamaChatModel")
+    private final ChatModel ollamaModel;
 
     private final ModelRouter modelRouter;
 
     public String chat(TaskType taskType, String prompt) {
-        ChatClient client = modelRouter.getProvider().equals("ollama")
-            ? ollamaClient : openRouterClient;
-        String model = modelRouter.getModelForTask(taskType);
+        ChatModel model = modelRouter.getProvider().equals("ollama")
+            ? ollamaModel : openRouterModel;
 
-        return client.prompt()
-            .user(prompt)
-            .options(ChatOptionsBuilder.builder().withModel(model).build())
-            .call()
-            .content();
+        Prompt promptObj = new Prompt(List.of(new UserMessage(prompt)));
+        ChatResponse response = model.call(promptObj);
+        return response.getResult().getOutput().getText();
     }
 
     public Flux<String> chatStream(TaskType taskType, String prompt) {
-        return chatClient.prompt()
-            .user(prompt)
-            .stream()
-            .content();
+        StreamingChatModel streamingModel = (StreamingChatModel) getActiveModel();
+        return streamingModel.stream(new Prompt(List.of(new UserMessage(prompt))))
+            .map(resp -> resp.getResult().getOutput().getText());
     }
 }
 ```
